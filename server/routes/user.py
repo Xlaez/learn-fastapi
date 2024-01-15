@@ -39,3 +39,12 @@ async def get_user_by_id(id):
     if user:
         return SuccessResponseModel(user, "User data fetched")
     return ErrorResponseModel("Error", 404, "User does not exist")
+
+@router.put("/{id}")
+async def update_user_data(id: str, req: UpdateUserModel = Body(...)):
+    req = {k: v for k, v in req.dict().items() if v is not None}
+    updated_user = await update_users(id, req)
+
+    if updated_user:
+        return SuccessResponseModel("User with ID: {} updated successfully".format(id), "Success")
+    return ErrorResponseModel("Error", 400, "Cannot update user data")

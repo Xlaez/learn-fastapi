@@ -22,9 +22,7 @@ class UserModel(BaseModel):
 class UpdateUserModel(BaseModel):
     fullname: Optional[str]
     email: Optional[str]
-    password: Optional[str]
     bio: Optional[str]
-    createdAt: Optional[str]
 
     class Config:
         json_schema_extra = {
@@ -32,8 +30,6 @@ class UpdateUserModel(BaseModel):
                 "fullname": "Josh Edem",
                 "email": "jsohedem@gmail.com",
                 "bio": "I am a passionate web developer".format,
-                "password": "somehashedpassword",
-                "createdAt": "2023-12-08 13:18:36.262078"
             }
         }
 
