@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from dotenv import load_dotenv
 import os
 import motor.motor_asyncio
@@ -17,13 +18,18 @@ users_collection = database.get_collection("users")
 
 def users_helper(users) -> dict:
     created_at_str = users.get("createdAt", "")
-    created_at_datetime = datetime.strptime(created_at_str, "%Y-%m-%d %H:%M:%S")
+
+    if isinstance(created_at_str, datetime):
+        created_at_datetime = created_at_str
+    else:
+        created_at_datetime = datetime.strptime(created_at_str, "%Y-%m-%d %H:%M:%S")
+
 
     return{
         "id": str(users["_id"]),
         "fullname": users["fullname"],
         "email": users["email"],
-        "password": users["password"],
+        # "password": users["password"],
         "bio": users["bio"],
         "createdAt": created_at_datetime
     }
@@ -70,6 +76,10 @@ async def create_user(user_data: dict) -> dict:
     """
     Creates a new user and add to the database
     """
+
+    user = await users_collection.find_one({"email": user_data["email"]})
+    if user:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "email taken, try with another email or login")
 
     user_data["createdAt"] = datetime.utcnow()
     user = await users_collection.insert_one(user_data)

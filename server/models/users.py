@@ -6,16 +6,16 @@ class UserModel(BaseModel):
     email: str = Field(...)
     password: str = Field(...)
     bio: str = Field(...)
-    createdAt: str = Field(...)
+    # createdAt: str = Field(...)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "fullname": "Josh Edem",
                 "email": "jsoh@edem.com",
                 "bio": "I am a passionate web developer".format,
                 "password": "somehashedpassword",
-                "createdAt": "2023-12-08 13:18:36.262078"
+                # "createdAt": "2023-12-08 13:18:36.262078"
             }
         }
 
@@ -27,7 +27,7 @@ class UpdateUserModel(BaseModel):
     createdAt: Optional[str]
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "fullname": "Josh Edem",
                 "email": "jsohedem@gmail.com",
