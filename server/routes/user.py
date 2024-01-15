@@ -48,3 +48,10 @@ async def update_user_data(id: str, req: UpdateUserModel = Body(...)):
     if updated_user:
         return SuccessResponseModel("User with ID: {} updated successfully".format(id), "Success")
     return ErrorResponseModel("Error", 400, "Cannot update user data")
+
+@router.delete("/{id}")
+async def delete_user_data(id:str):
+    deleted_user  = await delete_user(id)
+    if deleted_user:
+        return SuccessResponseModel("User with ID: {} deleted".format(id), "Successfully deleted user")
+    ErrorResponseModel("Error", 400, "Cannot delete user from database")
