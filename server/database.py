@@ -34,6 +34,24 @@ def users_helper(users) -> dict:
         "createdAt": created_at_datetime
     }
 
+def users_helper_with_password(users) -> dict:
+    created_at_str = users.get("createdAt", "")
+
+    if isinstance(created_at_str, datetime):
+        created_at_datetime = created_at_str
+    else:
+        created_at_datetime = datetime.strptime(created_at_str, "%Y-%m-%d %H:%M:%S")
+
+
+    return{
+        "id": str(users["_id"]),
+        "fullname": users["fullname"],
+        "email": users["email"],
+        "password": users["password"],
+        "bio": users["bio"],
+        "createdAt": created_at_datetime
+    }
+
 async def retrieve_users():
     """
     Retrieves all users present in the database
@@ -69,6 +87,17 @@ async def retrieve_user(id:str) -> dict:
     user = await users_collection.find_one({"_id": ObjectId(id)})
     if user:
         return users_helper(user)
+    else:
+        return {}
+    
+
+async def retrieve_user_email(email:str) -> dict:
+    """
+    Retrieves a single user
+    """
+    user = await users_collection.find_one({"email": email})
+    if user:
+        return users_helper_with_password(user)
     else:
         return {}
     

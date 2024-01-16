@@ -19,6 +19,19 @@ class UserModel(BaseModel):
             }
         }
 
+
+class UserLoginModel(BaseModel):
+    email: str = Field(...)
+    password: str = Field(...)
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "email": "jsoh@edem.com",
+                "password": "somehashedpassword",
+            }
+        }
+
 class UpdateUserModel(BaseModel):
     fullname: Optional[str]
     email: Optional[str]

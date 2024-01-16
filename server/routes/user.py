@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
 from server.utils.hash_password import (hash_password, compare_password)
+from server.utils.auth_tokens import (generate_access_token, generate_refresh_token)
 
 from server.database import(
     create_user,
     retrieve_user,
     retrieve_users,
     update_users,
-    delete_user
+    delete_user,
+    retrieve_user_email
 )
 
 from server.models.users import(
@@ -15,16 +17,30 @@ from server.models.users import(
     SuccessResponseModel,
     UserModel,
     UpdateUserModel,
+    UserLoginModel
 )
 
 router = APIRouter()
 
-@router.post("/", response_description="creates a new user")
+@router.post("/register", response_description="creates a new user")
 async def register(user: UserModel = Body(...)):
     user = jsonable_encoder(user)
     user["password"] = hash_password(user["password"])
     new_user = await create_user(user)
     return SuccessResponseModel(new_user, "User created successfully")
+
+@router.post("/signin", response_description="signin a new user")
+async def login(user: UserLoginModel = Body(...)):
+    present_user = await retrieve_user_email(jsonable_encoder(user)["email"])
+
+    if len(present_user) ==0 :
+        return ErrorResponseModel("Error", 400, "User not found, try signing up")
+    if(compare_password(jsonable_encoder(user)["password"], present_user["password"])):
+        access_token =  generate_access_token(present_user["id"])
+        refresh_token = generate_refresh_token(present_user["id"])
+    else:
+        return ErrorResponseModel("Error",400, "login credentials incorrect")
+    return SuccessResponseModel({"access_token": access_token, "refresh_token": refresh_token}, "User logged in successfully")
 
 @router.get("/all", response_description="Users fetched")
 async def get_users():
